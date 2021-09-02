@@ -1,0 +1,101 @@
+<%def money(num)
+  "$#{num.gsub(/\d(?=(...)+$)/, '\0,')}"
+end
+%>
+<form action="/portworx-precio" method="get">
+<div class="container">
+<!--CLUSTER IKS/OCP-->
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>Clúster IKS/OCP</h5>
+        </div>
+        <div class="ibox-content">
+          <h5>NOTAS:*Los precios lista que se presentarán son calculados y pueden variar respecto a los presentados en IBM Cloud en +-1%</h5>
+            <table class="table table-stripped">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Worker Nodes (min 3)</td>
+                  <td>
+                    <label for="workers"><input type="number" id="workers" name="workers" value="3" min="3" required>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Tipo de infraestructura</td>
+                    <td>
+                      <select name="tipo" id="tipo" required>
+                        <option value="dedicated">Dedicado</option>
+                        <option value="shared">Compartido</option>
+                        <option value="bm">Bare Metal</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Región</td>
+                    <td>
+                      <select name="region" id="region" required>
+                        <option value="mexico">México</option>
+                        <option value="dallas">Dallas</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button type="submit" class="btn btn-outline btn-primary">Quiero mi dimensionamiento</button>
+</form>
+
+<!--%=respuesta%-->
+<% if (respuesta != nil and respuesta.size>0) then%>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>Dimensionamiento de Portworx</h5>
+        </div>
+        <div class="ibox-content">
+          <table class="table table-stripped">
+            <thead>
+              <tr>
+                <th>Tipo de Infraestructura</th>
+                <th>Workers</th>
+                <th>Precio Total Mensual (USD)</th>
+                <th>Región</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><%= respuesta[0]["tipo"] %> </td>
+                <td><%= respuesta[0]["workers"] %></td>
+                <td>$<%= respuesta[0]["precio"] %> USD</td>
+                <td><%= respuesta[0]["region"] %></td>
+              </tr> 
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+
+  <div class="row">
+    <div class="col-12 text-center">
+      <form action="/menu" method="get">
+        <button type="submit" class="btn btn-outline btn-primary">Regresar</button>
+      </form>
+    </div>
+  </div>
+
