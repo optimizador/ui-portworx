@@ -41,7 +41,6 @@ end
                     <td>Región</td>
                     <td>
                       <select name="region" id="region" required>
-                        <option value="mexico">México</option>
                         <option value="dallas">Dallas</option>
                       </select>
                     </td>
@@ -54,11 +53,116 @@ end
   </div>
 </div>
 
+<!--BLOCK STORAGE-->
+<div class="row">
+
+    <div class="col-md-6">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>Block Storage</h5>
+        </div>
+        <div class="ibox-content">
+          <h5>NOTAS:*Los precios lista que se presentarán son calculados y pueden variar respecto a los presentados en IBM Cloud en +-1%</h5>
+            <table class="table table-stripped">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                  <td>Storage GB</td>
+                  <td>
+                    <label for="storage_block"><input type="number" id="storage_block" name="storage_block" required>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>IOPS</td>
+                    <td>
+                      <select name="iops" id="iops" required>
+                        <option value=".25">0.25 IOPS/GB</option>
+                        <option value="2">2 IOPS/GB</option>
+                        <option value="4">4 IOPS/GB</option>
+                        <option value="10">10 IOPS/GB</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                  <td>Replicas del clúster</td>
+                  <td>
+                    <label for="storage_replicas"><input type="number" id="replicas" name="replicas" required>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Región</td>
+                    <td>
+                      <select name="region_storage" id="region_storage" required>
+                        <option value="dallas">Dallas</option>
+                        <option value="mexico">México</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+      </div>
+    </div>
+
+<!--DATABASE FOR ETCD-->
+    <div class="col-md-6">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>DB for ETCD (1 instancia por cada clúster)</h5>
+        </div>
+        <div class="ibox-content">
+          <h5>NOTAS:*Los precios lista que se presentarán son calculados y pueden variar respecto a los presentados en IBM Cloud en +-1%</h5>
+            <table class="table table-stripped">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                    <td>Ram GB (min 8)</td>
+                    <td>
+                    <label for="ram_etcd"><input type="number" id="ram_etcd" name="ram_etcd" value="8" min="8">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Storage GB (min 128)</td>
+                    <td>
+                    <label for="storage_etcd"><input type="number" id="storage_etcd" name="storage_etcd" value="128" min="128">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Cores (min 3)</td>
+                    <td>
+                    <label for="cores"><input type="number" id="cores" name="cores" value="3" min="3"> 
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Región</td>
+                    <td>
+                      <select name="region_etcd" id="region_etcd">
+                        <option value="dallas">Dallas</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <button type="submit" class="btn btn-outline btn-primary">Quiero mi dimensionamiento</button>
 </form>
 
-<!--%=respuesta%-->
-<% if (respuesta != nil and respuesta.size>0) then%>
+<!--%=respuesta portworx%-->
+<% if (respuesta_portworx != nil and respuesta_portworx.size>0) then%>
   <div class="row">
     <div class="col-sm-12">
       <div class="ibox float-e-margins">
@@ -71,16 +175,86 @@ end
               <tr>
                 <th>Tipo de Infraestructura</th>
                 <th>Workers</th>
-                <th>Precio Total Mensual (USD)</th>
                 <th>Región</th>
+                <th>Precio(USD)</th>
+                <th>Precio Total Mensual (USD)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><%= respuesta[0]["tipo"] %> </td>
-                <td><%= respuesta[0]["workers"] %></td>
-                <td>$<%= respuesta[0]["precio"] %> USD</td>
-                <td><%= respuesta[0]["region"] %></td>
+                <td><%= respuesta_portworx[0]["tipo"] %> </td>
+                <td><%= respuesta_portworx[0]["workers"] %></td>
+                <td><%= respuesta_portworx[0]["region"] %></td>
+                <td>$<%= respuesta_portworx[0]["precio"] %> USD</td>
+                <td>$<%= total %> USD</td>
+              </tr> 
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<!--%=respuesta block storage%-->
+<% if (respuesta_storage != nil and respuesta_storage.size>0) then%>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>Block Storage para Portworx</h5>
+        </div>
+        <div class="ibox-content">
+          <table class="table table-stripped">
+            <thead>
+              <tr>
+                <th>IOPS</th>
+                <th>Almacenamiento (GB) (Max <%= respuesta_storage[0]["maxunit"] %>)</th>
+                <th>Precio (USD)</th>
+                <th>Precio Restante (USD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><%= respuesta_storage[0]["iops"] %> </td>
+                <td><%= respuesta_storage[0]["unidadrestante"] %></td>
+                <td>$<%= respuesta_storage[0]["preciounidadrestante"] %> USD</td>
+                <td>$<%= respuesta_storage[0]["precio"] %> USD</td>
+              </tr> 
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<!--%=respuesta db for etcd%-->
+<% if (respuesta_etcd != nil and respuesta_etcd.size>0 and respuesta_etcd[0]["precio"] != 0) then%>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>DB for ETCD para Portworx</h5>
+        </div>
+        <div class="ibox-content">
+          <table class="table table-stripped">
+            <thead>
+              <tr>
+                <th>RAM</th>
+                <th>Almacenamiento (GB)</th>
+                <th>Cores</th>
+                <th>Región</th>
+                <th>Precio (USD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><%= respuesta_etcd[0]["ram"] %></td>
+                <td><%= respuesta_etcd[0]["storage"] %></td>
+                <td><%= respuesta_etcd[0]["cores"] %></td>
+                <td><%= respuesta_etcd[0]["region"] %></td>
+                <td>$<%= respuesta_etcd[0]["precio"] %> USD</td>
               </tr> 
             </tbody>
           </table>
