@@ -22,31 +22,46 @@ end
               </thead>
               <tbody>
                 <tr>
+                  <td>Tipo de clúster</td>
+                  <td>
+                    <select name="cluster_type" id="cluster_type" required>
+                      <option value="iks">Kubernetes</option>
+                      <option value="ocp">Openshift</option>
+                  </td>
+                </tr>
+                <tr>
                   <td>Worker Nodes (min 3)</td>
                   <td>
                     <label for="workers"><input type="number" id="workers" name="workers" value="3" min="3" required>
                     </td>
-                  </tr>
-                  <tr>
-                    <td>Tipo de infraestructura</td>
-                    <td>
-                      <select name="tipo" id="tipo" required>
-                        <option value="dedicated">Dedicado</option>
-                        <option value="shared">Compartido</option>
-                        <option value="bm">Bare Metal</option>
-                      </select>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Región</td>
-                    <td>
-                      <select name="region" id="region" required>
-                        <option value="dallas">Dallas</option>
-                      </select>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                </tr>
+                <tr>
+                  <td>Tipo de infraestructura</td>
+                  <td>
+                    <select name="tipo" id="tipo" required>
+                      <option value="dedicated">Dedicado</option>
+                      <option value="shared">Compartido</option>
+                      <option value="bm">Bare Metal</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Flavor (min 16x64)</td>
+                  <td>
+                    <select name="flavor" id="flavor" required>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Región</td>
+                  <td>
+                    <select name="region" id="region" required>
+                      <option value="dallas">Dallas</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
         </div>
       </div>
     </div>
@@ -161,8 +176,8 @@ end
 <button type="submit" class="btn btn-outline btn-primary">Quiero mi dimensionamiento</button>
 </form>
 
-<!--%=respuesta portworx%-->
-<% if (respuesta_portworx != nil and respuesta_portworx.size>0) then%>
+<!--%=respuesta cluster%-->
+<% if (respuesta_cluster!= nil and respuesta_cluster.size>0 and respuesta_storage !=nil and respuesta_storage.size>0 and respuesta_portworx !=nil and respuesta_portworx.size>0) then%>
   <div class="row">
     <div class="col-sm-12">
       <div class="ibox float-e-margins">
@@ -173,19 +188,30 @@ end
           <table class="table table-stripped">
             <thead>
               <tr>
-                <th>Tipo de Infraestructura</th>
-                <th>Workers</th>
-                <th>Región</th>
-                <th>Precio(USD)</th>
+                <th>Servicio</th>
                 <th>Precio Total Mensual (USD)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><%= respuesta_portworx[0]["tipo"] %> </td>
-                <td><%= respuesta_portworx[0]["workers"] %></td>
-                <td><%= respuesta_portworx[0]["region"] %></td>
+                <td>Cluster</td>
+                <td>$<%= respuesta_cluster[0]["precio"] %> USD</td>
+              </tr>
+                <td>Portworx</td>
                 <td>$<%= respuesta_portworx[0]["precio"] %> USD</td>
+              </tr>
+              <tr>
+                <td>Block Storage</td>
+                <td>$<%= respuesta_storage[0]["preciounidadrestante"] + respuesta_storage[0]["precio"] %> USD</td>
+              </tr>
+              <% if (respuesta_etcd != nil and respuesta_etcd.size>0 and respuesta_etcd[0]["precio"] != 0) then%>
+                <tr>
+                  <td>Database for ETCD</td>
+                  <td>$<%= respuesta_etcd[0]["precio"]%> USD</td>
+                </tr>
+              <% end %>
+              <tr>
+                <td>Total: </td>
                 <td>$<%= total %> USD</td>
               </tr> 
             </tbody>
@@ -194,68 +220,127 @@ end
       </div>
     </div>
   </div>
-<% end %>
 
-<!--%=respuesta block storage%-->
-<% if (respuesta_storage != nil and respuesta_storage.size>0) then%>
   <div class="row">
     <div class="col-sm-12">
       <div class="ibox float-e-margins">
         <div class="ibox-title">
-          <h5>Block Storage para Portworx</h5>
+          <h5>Desglose de servicios:</h5>
         </div>
         <div class="ibox-content">
+          <h4>Cluster:</h4>
           <table class="table table-stripped">
             <thead>
               <tr>
-                <th>IOPS</th>
-                <th>Almacenamiento (GB) (Max <%= respuesta_storage[0]["maxunit"] %>)</th>
-                <th>Precio (USD)</th>
-                <th>Precio Restante (USD)</th>
+                <th>Parámetro</th>
+                <th>Valor</th>
               </tr>
             </thead>
             <tbody>
               <tr>
+                <td>Flavor</td>
+                <td><%= respuesta_cluster[0]["flavor"] %> </td>
+              </tr> 
+              <tr>
+                <td>Tipo de infraestructura</td>
+                <td><%= respuesta_cluster[0]["infra_type"] %> </td>
+              </tr> 
+              <tr>
+                <td>Región</td>
+                <td><%= respuesta_cluster[0]["region"] %> </td>>
+              </tr> 
+              <tr>
+                <td>Worker Nodes</td>
+                <td><%= respuesta_cluster[0]["workers"] %> </td>
+              </tr>
+              <tr>
+                <td>Precio</td>
+                <td>$<%= respuesta_cluster[0]["precio"] %> USD</td>
+              </tr>
+            </tbody>
+          </table>
+          <h4>Block Storage: </h4>
+          <table class="table table-stripped">
+            <thead>
+              <tr>
+                <th>Parámetro</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>IOPS</td>
                 <td><%= respuesta_storage[0]["iops"] %> </td>
-                <td><%= respuesta_storage[0]["unidadrestante"] %></td>
-                <td>$<%= respuesta_storage[0]["preciounidadrestante"] %> USD</td>
-                <td>$<%= respuesta_storage[0]["precio"] %> USD</td>
               </tr> 
+              <tr>
+                <td>Almacenamiento (GB) (Max <%= respuesta_storage[0]["maxunit"] %>)</td>
+                <td><%= respuesta_storage[0]["unidadrestante"] %> </td>
+              </tr> 
+                <td>Precio</td>
+                <td>$<%= respuesta_storage[0]["preciounidadrestante"] %> USD</td>
+              </tr>
+              </tr> 
+                <td>Precio Restante</td>
+                <td>$<%= respuesta_storage[0]["precio"] %> USD</td>
+              </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end %>
-
-<!--%=respuesta db for etcd%-->
-<% if (respuesta_etcd != nil and respuesta_etcd.size>0 and respuesta_etcd[0]["precio"] != 0) then%>
-  <div class="row">
-    <div class="col-sm-12">
-      <div class="ibox float-e-margins">
-        <div class="ibox-title">
-          <h5>DB for ETCD para Portworx</h5>
-        </div>
-        <div class="ibox-content">
+          <h4>Database for ETCD</h4>
           <table class="table table-stripped">
             <thead>
               <tr>
-                <th>RAM</th>
-                <th>Almacenamiento (GB)</th>
-                <th>Cores</th>
-                <th>Región</th>
-                <th>Precio (USD)</th>
+                <th>Parámetro</th>
+                <th>Valor</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><%= respuesta_etcd[0]["ram"] %></td>
-                <td><%= respuesta_etcd[0]["storage"] %></td>
-                <td><%= respuesta_etcd[0]["cores"] %></td>
-                <td><%= respuesta_etcd[0]["region"] %></td>
-                <td>$<%= respuesta_etcd[0]["precio"] %> USD</td>
+                <td>RAM (GB)</td>
+                <td><%= respuesta_etcd[0]["ram"] %> </td>
               </tr> 
+              <tr>
+                <td>Almacenamiento (GB)</td>
+                <td><%= respuesta_etcd[0]["storage"] %> </td>
+              </tr>
+              <tr>
+                <td>Cores</td>
+                <td><%= respuesta_etcd[0]["cores"] %> </td>
+              </tr>  
+              <tr>
+                <td>Región</td>
+                <td><%= respuesta_etcd[0]["region"] %> </td>
+              </tr>  
+              <tr>
+                <td>Precio</td>
+                <td>$<%= respuesta_etcd[0]["precio"] %> USD</td>
+              </tr>
+            </tbody>
+          </table>
+          <h4>Portworx: </h4>
+          <table class="table table-stripped">
+            <thead>
+              <tr>
+                <th>Parámetro</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Worker Nodes</td>
+                <td><%= respuesta_portworx[0]["workers"] %> </td>
+              </tr> 
+              <tr>
+                <td>Tipo de infraestructura</td>
+                <td><%= respuesta_portworx[0]["tipo"] %> </td>
+              </tr> 
+              <tr>
+                <td>Región</td>
+                <td><%= respuesta_portworx[0]["region"] %> </td>
+              </tr> 
+              <tr>
+                <td>Precio</td>
+                <td>$<%= respuesta_portworx[0]["precio"] %> USD</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -263,7 +348,6 @@ end
     </div>
   </div>
 <% end %>
-
 
   <div class="row">
     <div class="col-12 text-center">
@@ -272,4 +356,17 @@ end
       </form>
     </div>
   </div>
+
+  <script>
+    $(document).ready(function () {
+      $("#tipo").change(function () {
+          var val = $(this).val();
+          if (val == "shared" || val == "dedicated") {
+              $("#flavor").html(<option value='16x64'>16x64</option>");
+          } else {
+              $("#flavor").html("<option value='mb4c.20x64'>mb4c.20x64</option>");
+          }
+      });
+    });
+  </script>
 
