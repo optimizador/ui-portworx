@@ -57,6 +57,7 @@ end
                   <td>
                     <select name="region" id="region" required>
                       <option value="dallas">Dallas</option>
+                      <option value="mexico">México</option>
                     </select>
                   </td>
                 </tr>
@@ -172,8 +173,12 @@ end
       </div>
     </div>
   </div>
+<div class="col-lg-12 text-center">
+  <button type="submit" class="btn btn-outline btn-primary">Quiero mi dimensionamiento</button>
+</div>
 
-<button type="submit" class="btn btn-outline btn-primary">Quiero mi dimensionamiento</button>
+<br><br>
+
 </form>
 
 <!--%=respuesta cluster%-->
@@ -185,7 +190,7 @@ end
           <h5>Dimensionamiento de Portworx</h5>
         </div>
         <div class="ibox-content">
-          <table class="table table-stripped">
+          <table class="table table-stripped" id="dimensionamiento">
             <thead>
               <tr>
                 <th>Servicio</th>
@@ -229,7 +234,7 @@ end
         </div>
         <div class="ibox-content">
           <h4>Cluster:</h4>
-          <table class="table table-stripped">
+          <table class="table table-stripped" id="cluster">
             <thead>
               <tr>
                 <th>Parámetro</th>
@@ -260,7 +265,7 @@ end
             </tbody>
           </table>
           <h4>Block Storage: </h4>
-          <table class="table table-stripped">
+          <table class="table table-stripped" id="storage">
             <thead>
               <tr>
                 <th>Parámetro</th>
@@ -286,7 +291,7 @@ end
             </tbody>
           </table>
           <h4>Database for ETCD</h4>
-          <table class="table table-stripped">
+          <table class="table table-stripped" id="dbetcd">
             <thead>
               <tr>
                 <th>Parámetro</th>
@@ -317,7 +322,7 @@ end
             </tbody>
           </table>
           <h4>Portworx: </h4>
-          <table class="table table-stripped">
+          <table class="table table-stripped" id="portworx">
             <thead>
               <tr>
                 <th>Parámetro</th>
@@ -350,10 +355,13 @@ end
 <% end %>
 
   <div class="row">
-    <div class="col-12 text-center">
+    <div class="col-lg-6 text-center">
       <form action="/menu" method="get">
         <button type="submit" class="btn btn-outline btn-primary">Regresar</button>
       </form>
+    </div>
+    <div class="col-lg-6 text-center">
+      <a class="btn btn-outline btn-primary" href="#" id="anchorNewApi-xlsx" onclick="return portworxExcel('xlsx');">Obtener Excel</a>
     </div>
   </div>
 
@@ -362,11 +370,45 @@ end
       $("#tipo").change(function () {
           var val = $(this).val();
           if (val == "shared" || val == "dedicated") {
-              $("#flavor").html(<option value='16x64'>16x64</option>");
+              $("#flavor").html("<option value='16x64'>16x64</option>");
           } else {
               $("#flavor").html("<option value='mb4c.20x64'>mb4c.20x64</option>");
           }
       });
     });
+
+    function portworxExcel(format) {
+      return ExcellentExport.convert({
+        anchor: 'anchorNewApi-' + format,
+        filename: 'dimensionamiento_portworx',
+        format: format
+      }, [{
+          name: 'dimensionamiento',
+          from: {
+            table: 'dimensionamiento'
+          }
+      },{
+        name: 'cluster',
+        from: {
+          table: 'cluster'
+        }
+      },{
+        name: 'storage',
+        from: {
+          table: 'storage'
+        }
+      },{
+        name: 'dbetcd',
+        from: {
+          table: 'dbetcd'
+        }
+      },{
+        name: 'portworx',
+        from: {
+          table: 'portworx'
+        }
+      }
+      ]);
+    }
   </script>
 
