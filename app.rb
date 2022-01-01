@@ -29,8 +29,8 @@ get '/portworx-precio' do
   # CLUSTER
   logger.info("Dimensionamiento portworx:\n")
 
-  urlapi = 'http://169.57.7.203:30973'
-  urlapi2 = 'http://169.57.7.203:30778'
+  urlapi = 'https://apis-portworx.ioi17ary7au.us-south.codeengine.appdomain.cloud'
+  urlapi2 = 'https://apis.9sxuen7c9q9.us-south.codeengine.appdomain.cloud'
 
   tipo_cluster = params['cluster_type'].to_s # IKS o OCP
   cluster_workers = params['workers'].to_s
