@@ -49,6 +49,7 @@ end
                   <td>Flavor (min 16x64)</td>
                   <td>
                     <select name="flavor" id="flavor" required>
+                      <option value="16x64" selected>16x64</option>
                     </select>
                   </td>
                 </tr>
@@ -98,16 +99,16 @@ end
                     <td>
                       <select name="iops" id="iops" required>
                         <option value=".25">0.25 IOPS/GB</option>
-                        <option value="2">2 IOPS/GB</option>
+                        <option value="2" selected="selected">2 IOPS/GB</option>
                         <option value="4">4 IOPS/GB</option>
                         <option value="10">10 IOPS/GB</option>
                       </select>
                     </td>
                   </tr>
                   <tr>
-                  <td>Replicas del clúster</td>
+                  <td>Replicas del almacenamiento</td>
                   <td>
-                    <label for="storage_replicas"><input type="number" id="replicas" name="replicas" required>
+                    <label for="storage_replicas"><input type="number" id="replicas" name="replicas" value=3 required>
                     </td>
                   </tr>
                   <tr>
